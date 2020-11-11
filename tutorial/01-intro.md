@@ -22,10 +22,10 @@ Sie sollten auch über ein persönliches Microsoft-Konto mit einem Postfach auf 
 > [!NOTE]
 > Dieses Lernprogramm wurde mithilfe der nativen CLI-Reaktions Software geschrieben, die je nach Betriebssystem und Zielplattform spezifische Voraussetzungen hat. Anweisungen zum Konfigurieren des Entwicklungscomputers finden Sie unter [reagieren systemeigene erste Schritte](https://reactnative.dev/docs/environment-setup) . Die für dieses Lernprogramm verwendeten Versionen sind unten aufgeführt. Die Schritte in diesem Leitfaden funktionieren möglicherweise mit anderen Versionen, jedoch nicht getestet.
 >
-> - Android Studio Version 3.6.2 mit dem Android 9,0 SDK
+> - Android Studio Version 4,1 mit dem Android 9,0 SDK
 > - Java Development Kit-Version 12.0.2
-> - Xcode Version 11,4
-> - Node. js-Version 12.16.2
+> - Xcode Version 12,1
+> - Node.js Version 14.15.0
 
 ## <a name="feedback"></a>Feedback
 

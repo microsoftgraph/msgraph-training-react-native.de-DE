@@ -8,21 +8,13 @@ In dieser Übungseinheit erstellen Sie eine Reaktionssystem eigene Anwendung mit
 
 - [Reagieren von systemeigenen Microsoft Graph-Lernprogrammen](https://docs.microsoft.com/graph/tutorials/react-native)
 
-## <a name="demos"></a>Demos
-
-Das [Demos](./demos) -Verzeichnis in diesem Repository enthält Kopien des Projekts, die dem Ausführen einzelner Abschnitte des Lernprogramms entsprechen. Wenn Sie lediglich einen bestimmten Abschnitt des Lernprogramms Demo ausführen möchten, können Sie mit der Version aus dem vorherigen Abschnitt beginnen.
-
-- [01-Create-App](demos/01-create-app): abgeschlossen [Erstellen einer Reaktionssystem eigenen App](https://docs.microsoft.com/graph/tutorials/react-native?tutorial-step=1)
-- [02-Add-Aad-auth](demos/02-add-aad-auth): abgeschlossene [Add Azure AD-Authentifizierung](https://docs.microsoft.com/graph/tutorials/react-native?tutorial-step=3)
-- [03-Add-MSGraph](demos/03-add-msgraph): abgeschlossene [Abrufen von Kalenderdaten](https://docs.microsoft.com/graph/tutorials/react-native?tutorial-step=4)
-
 ## <a name="completed-sample"></a>Abgeschlossenes Beispiel
 
 Wenn Sie das fertige Beispiel nur generieren möchten, indem Sie dieser Übungseinheit folgen, können Sie es hier finden.
 
-- [Fertig gestelltes Projekt](demos/03-add-msgraph)
+- [Fertig gestelltes Projekt](./demo)
 
-## <a name="disclaimer"></a>Verzichtserklärung
+## <a name="disclaimer"></a>Haftungsausschluss
 
 **Dieser Code wird ohne jegliche ausdrückliche oder implizite *Gewährleistung bereit* gestellt, einschließlich impliziter Garantien für die Eignung für einen bestimmten Zweck, die Marktgängigkeit oder die Nichtverletzung.**
 

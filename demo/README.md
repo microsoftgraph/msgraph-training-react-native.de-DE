@@ -12,10 +12,10 @@ Um das abgeschlossene Projekt in diesem Ordner auszuführen, benötigen Sie Folg
 
 > **Hinweis:** Dieses Lernprogramm wurde mithilfe der nativen CLI-Reaktions Software geschrieben, die je nach Betriebssystem und Zielplattform spezifische Voraussetzungen hat. Anweisungen zum Konfigurieren des Entwicklungscomputers finden Sie unter [reagieren systemeigene erste Schritte](https://facebook.github.io/react-native/docs/getting-started) . Die für dieses Lernprogramm verwendeten Versionen sind unten aufgeführt. Die Schritte in diesem Leitfaden funktionieren möglicherweise mit anderen Versionen, jedoch nicht getestet.
 >
-> - Android Studio Version 3.6.2 mit dem Android 9,0 SDK
+> - Android Studio Version 4,1 mit dem Android 9,0 SDK
 > - Java Development Kit-Version 12.0.2
-> - Xcode Version 11,4
-> - Node. js-Version 12.16.2
+> - Xcode Version 12,1
+> - Node.js Version 14.15.0
 
 Wenn Sie kein Microsoft-Konto haben, gibt es mehrere Optionen, um ein kostenloses Konto zu erhalten:
 
@@ -34,7 +34,7 @@ Wenn Sie kein Microsoft-Konto haben, gibt es mehrere Optionen, um ein kostenlose
 
     - Legen Sie **Name** auf `React Native Graph Tutorial` fest.
     - Legen Sie **Unterstützte Kontotypen** auf **Konten in allen Organisationsverzeichnissen und persönliche Microsoft-Konten** fest.
-    - Ändern Sie unter **Umleitungs-URI**das Dropdown-Menü auf **Public Client (Mobile & Desktop)**, `graph-tutorial://react-native-auth`und legen Sie den Wert auf fest.
+    - Ändern Sie unter **Umleitungs-URI** das Dropdown-Menü auf **Public Client (Mobile & Desktop)** , und legen Sie den Wert auf fest `graph-tutorial://react-native-auth` .
 
     ![Screenshot der Seite "Anwendung registrieren"](/tutorial/images/aad-register-an-app.png)
 
@@ -42,13 +42,13 @@ Wenn Sie kein Microsoft-Konto haben, gibt es mehrere Optionen, um ein kostenlose
 
     ![Screenshot der Anwendungs-ID der neuen App-Registrierung](/tutorial/images/aad-application-id.png)
 
-1. Wählen Sie unter **Verwalten**die Option **Authentifizierung**aus. Fügen Sie auf der Seite " **Umleitungs-URIs** " einen weiteren Umleitungs-URI vom Typ " **Public Client" (Mobile & Desktop)** mit dem URI `urn:ietf:wg:oauth:2.0:oob`hinzu. Klicken Sie auf **Speichern**.
+1. Wählen Sie unter **Verwalten** die Option **Authentifizierung** aus. Fügen Sie auf der Seite " **Umleitungs-URIs** " einen weiteren Umleitungs-URI vom Typ " **Public Client" (Mobile & Desktop)** mit dem URI hinzu `urn:ietf:wg:oauth:2.0:oob` . Klicken Sie auf **Speichern**.
 
     ![Screenshot der Seite "Umleitungs-URIs"](/tutorial/images/aad-redirect-uris.png)
 
 ## <a name="configure-the-sample"></a>Konfigurieren des Beispiels
 
-1. Benennen Sie die Datei **GraphTutorial/auth/AuthConfig. TS. example** in **AuthConfig. TS**um.
+1. Benennen Sie die Datei **GraphTutorial/auth/AuthConfig. example. TS** in **AuthConfig. TS** um.
 1. Bearbeiten Sie die Datei **AuthConfig. TS** , und nehmen Sie die folgenden Änderungen vor.
     1. Ersetzen `YOUR_APP_ID_HERE` Sie durch die **Anwendungs-ID** , die Sie im App-Registrierungs Portal erhalten haben.
 

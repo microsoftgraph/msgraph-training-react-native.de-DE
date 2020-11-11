@@ -4,18 +4,21 @@ In dieser Übung werden Sie das Microsoft Graph in die Anwendung integrieren. F�
 
 ## <a name="get-calendar-events-from-outlook"></a>Abrufen von Kalenderereignissen von Outlook
 
-In diesem Abschnitt erweitern Sie die `GraphManager` Klasse so, dass eine Funktion hinzugefügt wird, um die Ereignisse `CalendarScreen` des Benutzers abzurufen und diese neuen Funktionen zu aktualisieren.
+In diesem Abschnitt erweitern Sie die `GraphManager` Klasse, um eine Funktion hinzuzufügen, um die Ereignisse des Benutzers für die aktuelle Woche abzurufen, und aktualisieren `CalendarScreen` , damit diese neuen Funktionen verwendet werden.
 
-1. Öffnen Sie die Datei **GraphTutorial/Graph/graphmanager. TSX** , und fügen Sie der `GraphManager` Klasse die folgende Methode hinzu.
+1. Öffnen Sie die Datei **GraphTutorial/Graph/graphmanager. TSX** , und fügen Sie der Klasse die folgende Methode hinzu `GraphManager` .
 
-    :::code language="typescript" source="../demo/GraphTutorial/graph/GraphManager.ts" id="GetEventsSnippet":::
+    :::code language="typescript" source="../demo/GraphTutorial/graph/GraphManager.ts" id="GetCalendarViewSnippet":::
 
     > [!NOTE]
-    > Überprüfen Sie, was `getEvents` der Code in tut.
+    > Überprüfen Sie, was der Code in `getCalendarView` tut.
     >
-    > - Die URL, die aufgerufen wird, lautet `/v1.0/me/events`.
+    > - Die URL, die aufgerufen wird, lautet `/v1.0/me/calendarView`.
+    > - Die `header` -Funktion fügt die `Prefer: outlook.timezone` Kopfzeile der Anforderung hinzu, wodurch sich die Zeiten in der Antwort in der bevorzugten Zeitzone des Benutzers befinden.
+    > - Die `query` -Funktion fügt die `startDateTime` Parameter and hinzu und `endDateTime` definiert das Zeitfenster für die Kalenderansicht.
     > - Die `select` Funktion schränkt die für die einzelnen Ereignisse zurückgegebenen Felder auf diejenigen ein, die von der APP tatsächlich verwendet werden.
-    > - Die `orderby`-Funktion sortiert die Ergebnisse nach Datum und Uhrzeit ihrer Erstellung, wobei das aktuellste Element zuerst angezeigt wird.
+    > - Die `orderby` -Funktion sortiert die Ergebnisse nach dem Startzeitpunkt.
+    > - Die `top` Funktion schränkt die Ergebnisse auf die ersten 50-Ereignisse ein.
 
 1. Öffnen Sie die **GraphTutorial/views/CalendarScreen. TSX** , und ersetzen Sie den gesamten Inhalt durch den folgenden Code.
 
@@ -26,23 +29,29 @@ In diesem Abschnitt erweitern Sie die `GraphManager` Klasse so, dass eine Funkti
       Alert,
       FlatList,
       Modal,
+      Platform,
       ScrollView,
       StyleSheet,
       Text,
       View,
     } from 'react-native';
     import { createStackNavigator } from '@react-navigation/stack';
+    import * as MicrosoftGraph from '@microsoft/microsoft-graph-types';
+    import moment from 'moment-timezone';
+    import { findOneIana } from 'windows-iana';
 
-    import { DrawerToggle, headerOptions } from '../menus/HeaderComponents';
+    import { UserContext } from '../UserContext';
     import { GraphManager } from '../graph/GraphManager';
 
     const Stack = createStackNavigator();
-    const initialState: CalendarScreenState = { loadingEvents: true, events: []};
-    const CalendarState = React.createContext(initialState);
+    const CalendarState = React.createContext<CalendarScreenState>({
+      loadingEvents: true,
+      events: []
+    });
 
     type CalendarScreenState = {
       loadingEvents: boolean;
-      events: any[];
+      events: MicrosoftGraph.Event[];
     }
 
     // Temporary JSON view
@@ -53,7 +62,10 @@ In diesem Abschnitt erweitern Sie die `GraphManager` Klasse so, dass eine Funkti
         <View style={styles.container}>
           <Modal visible={calendarState.loadingEvents}>
             <View style={styles.loading}>
-              <ActivityIndicator animating={calendarState.loadingEvents} size='large' />
+              <ActivityIndicator
+                color={Platform.OS === 'android' ? '#276b80' : undefined}
+                animating={calendarState.loadingEvents}
+                size='large' />
             </View>
           </Modal>
           <ScrollView>
@@ -64,6 +76,7 @@ In diesem Abschnitt erweitern Sie die `GraphManager` Klasse so, dass eine Funkti
     }
 
     export default class CalendarScreen extends React.Component {
+      static contextType = UserContext;
 
       state: CalendarScreenState = {
         loadingEvents: true,
@@ -72,7 +85,27 @@ In diesem Abschnitt erweitern Sie die `GraphManager` Klasse so, dass eine Funkti
 
       async componentDidMount() {
         try {
-          const events = await GraphManager.getEvents();
+          const tz = this.context.userTimeZone || 'UTC';
+          // Convert user's Windows time zone ("Pacific Standard Time")
+          // to IANA format ("America/Los_Angeles")
+          // Moment.js needs IANA format
+          const ianaTimeZone = findOneIana(tz);
+
+          // Get midnight on the start of the current week in the user's
+          // time zone, but in UTC. For example, for PST, the time value
+          // would be 07:00:00Z
+          const startOfWeek = moment
+            .tz(ianaTimeZone!.valueOf())
+            .startOf('week')
+            .utc();
+
+          const endOfWeek = moment(startOfWeek)
+            .add(7, 'day');
+
+          const events = await GraphManager.getCalendarView(
+            startOfWeek.format(),
+            endOfWeek.format(),
+            tz);
 
           this.setState({
             loadingEvents: false,
@@ -89,18 +122,18 @@ In diesem Abschnitt erweitern Sie die `GraphManager` Klasse so, dass eine Funkti
             ],
             { cancelable: false }
           );
+
         }
       }
 
       render() {
         return (
           <CalendarState.Provider value={this.state}>
-            <Stack.Navigator screenOptions={ headerOptions }>
+            <Stack.Navigator>
               <Stack.Screen name='Calendar'
                 component={ CalendarComponent }
                 options={{
-                  title: 'Calendar',
-                  headerLeft: () => <DrawerToggle/>
+                  headerShown: false
                 }} />
             </Stack.Navigator>
           </CalendarState.Provider>
@@ -139,17 +172,11 @@ Sie können nun die app ausführen, sich anmelden und auf das Navigationselement
 
 Nun können Sie das JSON-Dump durch etwas ersetzen, um die Ergebnisse auf eine benutzerfreundliche Weise anzuzeigen. In diesem Abschnitt fügen Sie ein `FlatList` zum Bildschirm Kalender hinzu, um die Ereignisse zu rendern.
 
-1. Öffnen Sie die Datei **GraphTutorial/Graph/Screens/CalendarScreen. TSX** , und `import` fügen Sie die folgende Anweisung am Anfang der Datei hinzu.
-
-    ```typescript
-    import moment from 'moment';
-    ```
-
-1. Fügen Sie die folgende **above** Methode oberhalb `CalendarScreen` der Klassendeklaration hinzu.
+1. Fügen Sie die folgende Methode **oberhalb** der `CalendarScreen` Klassendeklaration hinzu.
 
     :::code language="typescript" source="../demo/GraphTutorial/screens/CalendarScreen.tsx" id="ConvertDateSnippet":::
 
-1. Ersetzen Sie `ScrollView` die in `CalendarComponent` der-Methode durch Folgendes.
+1. Ersetzen Sie die `ScrollView` in der `CalendarComponent` -Methode durch Folgendes.
 
     ```typescript
     <FlatList data={calendarState.events}

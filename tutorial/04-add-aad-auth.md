@@ -5,7 +5,7 @@ In dieser Übung erweitern Sie die Anwendung aus der vorherigen Übung, um die A
 1. Erstellen Sie ein neues Verzeichnis im **GraphTutorial** -Verzeichnis mit dem Namen **auth**.
 1. Erstellen Sie eine neue Datei im **GraphTutorial/auth-** Verzeichnis mit dem Namen **AuthConfig. TS**. Fügen Sie den folgenden Code in die Datei ein:
 
-    :::code language="typescript" source="../demo/GraphTutorial/auth/AuthConfig.ts.example":::
+    :::code language="typescript" source="../demo/GraphTutorial/auth/AuthConfig.example.ts":::
 
     Ersetzen `YOUR_APP_ID_HERE` Sie durch die APP-ID aus Ihrer APP-Registrierung.
 
@@ -16,50 +16,47 @@ In dieser Übung erweitern Sie die Anwendung aus der vorherigen Übung, um die A
 
 In diesem Abschnitt erstellen Sie eine Hilfsklasse für die Authentifizierung und aktualisieren die APP, um sich anzumelden und abzumelden.
 
-1. Erstellen Sie eine neue Datei im **GraphTutorial/auth-** Verzeichnis namens " **AuthManager. TS**". Fügen Sie den folgenden Code in die Datei ein:
+1. Erstellen Sie eine neue Datei im **GraphTutorial/auth-** Verzeichnis namens " **AuthManager. TS** ". Fügen Sie den folgenden Code in die Datei ein:
 
     :::code language="typescript" source="../demo/GraphTutorial/auth/AuthManager.ts" id="AuthManagerSnippet":::
 
-1. Öffnen Sie die Datei **GraphTutorial/views/SignInScreen. TSX** , und fügen `import` Sie die folgende Anweisung am Anfang der Datei hinzu.
+1. Öffnen Sie die Datei **GraphTutorial/app. TSX** , und fügen Sie die folgende `import` Anweisung am Anfang der Datei hinzu.
+
+    ```typescript
+    import { AuthManager } from './auth/AuthManager';
+    ```
+
+1. Ersetzen Sie die vorhandene `authContext` Deklaration durch Folgendes.
+
+    :::code language="typescript" source="../demo/GraphTutorial/App.tsx" id="AuthContextSnippet" highlight="4-6,9":::
+
+1. Öffnen Sie die Datei **GraphTutorial/Menus/DrawerMenu. TSX** , und fügen Sie die folgende `import` Anweisung am Anfang der Datei hinzu.
 
     ```typescript
     import { AuthManager } from '../auth/AuthManager';
     ```
 
-1. Ersetzen Sie die `_signInAsync` vorhandene Methode durch Folgendes.
-
-    :::code language="typescript" source="../demo/GraphTutorial/screens/SignInScreen.tsx" id="SignInAsyncSnippet":::
-
-1. Öffnen Sie die Datei **GraphTutorial/views/homescreen. TSX** , und fügen `import` Sie die folgende Anweisung am Anfang der Datei hinzu.
+1. Fügen Sie der-Funktion den folgenden Code hinzu `componentDidMount` .
 
     ```typescript
-    import { AuthManager } from '../auth/AuthManager';
-    ```
+    try {
+      const accessToken = await AuthManager.getAccessTokenAsync();
 
-1. Fügen Sie der Klasse `HomeScreen` die folgende Methode hinzu.
-
-    ```typescript
-    async componentDidMount() {
-      try {
-        const accessToken = await AuthManager.getAccessTokenAsync();
-
-        // TEMPORARY
-        this.setState({userName: accessToken, userLoading: false});
-      } catch (error) {
-        alert(error);
-      }
+      // TEMPORARY
+      this.setState({userFirstName: accessToken, userLoading: false});
+    } catch (error) {
+      Alert.alert(
+        'Error getting token',
+        JSON.stringify(error),
+        [
+          {
+            text: 'OK'
+          }
+        ],
+        { cancelable: false }
+      );
     }
     ```
-
-1. Öffnen Sie die Datei **GraphTutorial/Menus/DrawerMenu. TSX** , und `import` fügen Sie die folgende Anweisung am Anfang der Datei hinzu.
-
-    ```typescript
-    import { AuthManager } from '../auth/AuthManager';
-    ```
-
-1. Ersetzen Sie die `_signOut` vorhandene Methode durch Folgendes.
-
-    :::code language="typescript" source="../demo/GraphTutorial/menus/DrawerMenu.tsx" id="SignOutSnippet" highlight="5":::
 
 1. Speichern Sie Ihre Änderungen, und laden Sie die Anwendung in Ihrem Emulator erneut.
 
@@ -67,7 +64,7 @@ Wenn Sie sich bei der App anmelden, sollte auf der **Willkommens** Seite ein Zug
 
 ## <a name="get-user-details"></a>Benutzerdetails abrufen
 
-In diesem Abschnitt erstellen Sie einen benutzerdefinierten Authentifizierungsanbieter für die Graph-Clientbibliothek, erstellen eine Hilfsklasse zum Aufbewahren aller Aufrufe von Microsoft Graph und aktualisieren `HomeScreen` die `DrawerMenuContent` und-Klassen, um diese neue Klasse zum Abrufen des angemeldeten Benutzers zu verwenden.
+In diesem Abschnitt erstellen Sie einen benutzerdefinierten Authentifizierungsanbieter für die Graph-Clientbibliothek, erstellen Sie eine Hilfsklasse, die alle Aufrufe von Microsoft Graph enthält, und aktualisieren Sie die `DrawerMenuContent` Klasse, um die neue Klasse zum Abrufen des angemeldeten Benutzers zu verwenden.
 
 1. Erstellen Sie ein neues Verzeichnis im **GraphTutorial** -Verzeichnis mit dem Namen **Graph**.
 1. Erstellen Sie eine neue Datei im **GraphTutorial/Graph-** Verzeichnis mit dem Namen **GraphAuthProvider. TS**. Fügen Sie den folgenden Code in die Datei ein:
@@ -92,28 +89,21 @@ In diesem Abschnitt erstellen Sie einen benutzerdefinierten Authentifizierungsan
     export class GraphManager {
       static getUserAsync = async() => {
         // GET /me
-        return graphClient.api('/me').get();
+        return await graphClient
+          .api('/me')
+          .select('displayName,givenName,mail,mailboxSettings,userPrincipalName')
+          .get();
       }
     }
     ```
 
-1. Öffnen Sie die Datei **GraphTutorial/views/homescreen. TSX** , und fügen `import` Sie die folgende Anweisung am Anfang der Datei hinzu.
+1. Öffnen Sie die Datei **GraphTutorial/views/DrawerMenu. TSX** , und fügen Sie die folgende `import` Anweisung am Anfang der Datei hinzu.
 
     ```typescript
     import { GraphManager } from '../graph/GraphManager';
     ```
 
-1. Ersetzen Sie `componentDidMount` die-Methode durch Folgendes.
-
-    :::code language="typescript" source="../demo/GraphTutorial/screens/HomeScreen.tsx" id="ComponentDidMountSnippet" highlight="3-6,9":::
-
-1. Öffnen Sie die Datei **GraphTutorial/views/DrawerMenu. TSX** , und fügen `import` Sie die folgende Anweisung am Anfang der Datei hinzu.
-
-    ```typescript
-    import { GraphManager } from '../graph/GraphManager';
-    ```
-
-1. Fügen Sie der Klasse die folgende`componentDidMount` Methode hinzu`DrawerMenuContent`.
+1. Ersetzen Sie die `componentDidMount` -Methode durch Folgendes.
 
     :::code language="typescript" source="../demo/GraphTutorial/menus/DrawerMenu.tsx" id="ComponentDidMountSnippet":::
 
